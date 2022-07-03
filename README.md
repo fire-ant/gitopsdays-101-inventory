@@ -43,6 +43,9 @@ to setup a micro-vm run:
 ```
 ./template.sh -k $PWD/id_rsa.pub -i cdl
 ```
+
+where `-k $PWD/id_rsa.pub` is pointing to the absolute path of your SSH public key and `-i cdl` is supplying an identifier you can correlate to your configuration later.
+
 running this command recursively will create more vm entries under [manifests/](manifests/). you dont have to but it may be easier to add the .ssh/config entry. Otherwise remember these details and use them to test SSH login later.
 
 to see how the template script works run:
