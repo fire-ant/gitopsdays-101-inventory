@@ -1,0 +1,39 @@
+apiVersion: ignite.weave.works/v1alpha4
+kind: VM
+metadata:
+  created: "2022-07-03T21:47:49Z"
+  name: registry
+  uid: 274343a7f72dad78
+spec:
+  cpus: 2
+  diskSize: 30GB
+  image:
+    oci: registry:latest
+  kernel:
+    cmdLine: console=ttyS0 reboot=k panic=1 pci=off ip=dhcp
+    oci: weaveworks/ignite-kernel:5.10.51
+  memory: 2GB
+  network:
+    ports:
+    - bindAddress: 0.0.0.0
+      hostPort: 5000
+      protocol: tcp
+      vmPort: 5000
+  sandbox:
+    oci: weaveworks/ignite:v0.10.0
+  storage: {}
+status:
+  idPrefix: ""
+  image:
+    id: null
+    size: 0B
+  kernel:
+    id: null
+    size: 0B
+  network:
+    ipAddresses: null
+    plugin: ""
+  running: true
+  runtime:
+    id: ""
+    name: ""

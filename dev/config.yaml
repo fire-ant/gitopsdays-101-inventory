@@ -1,0 +1,17 @@
+apiVersion: ignite.weave.works/v1alpha4
+kind: Configuration
+metadata:
+  name: base-config
+spec:
+  runtime: containerd
+  networkPlugin: cni
+  vmDefaults:
+    memory: 2GB
+    diskSize: 2GB
+    cpus: 1
+    image:
+      oci: chr1slavery/ignite-docker:20.04-amd64
+    kernel:
+      oci: weaveworks/ignite-kernel:5.14.16
+    sandbox:
+      oci: weaveworks/ignite:v0.10.0
