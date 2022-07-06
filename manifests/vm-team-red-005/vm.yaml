@@ -22,4 +22,4 @@ spec:
 status:
   network:
     plugin: "bridge"
-  running: true
+  running: false 
