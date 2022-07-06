@@ -20,4 +20,4 @@ spec:
       vmPath: /etc/docker/daemon.json
   ssh: /etc/firecracker/manifests/vm-team-red-003/id_rsa.pub
 status:
-  running: false
+  running: true 
