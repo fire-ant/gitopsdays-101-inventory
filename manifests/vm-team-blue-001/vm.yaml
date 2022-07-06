@@ -20,4 +20,4 @@ spec:
       vmPath: /etc/docker/daemon.json
   ssh: /etc/firecracker/manifests/vm-team-blue-001/ed_25519.pub
 status:
-  running: false 
+  running: true 
