@@ -2,8 +2,8 @@
 apiVersion: ignite.weave.works/v1alpha4
 kind: VM
 metadata:
-  name: vm--002
-  uid: 8abd7daf94a729df
+  name: vm-cdd-002
+  uid: 37a40aab96f35a86
 spec:
   image:
     oci: chr1slavery/ignite-docker:20.04-amd64
@@ -18,6 +18,6 @@ spec:
   copyFiles:
     - hostPath: /etc/firecracker/manifests/files/daemon.json
       vmPath: /etc/docker/daemon.json
-  ssh: /etc/firecracker/manifests/vm--002/
+  ssh: /etc/firecracker/manifests/vm-cdd-002/id_rsa.pub
 status:
   running: true
