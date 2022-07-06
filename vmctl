@@ -13,7 +13,7 @@ DEST=/etc/firecracker/manifests
 TARGETHOST=${TARGETHOST:-127.0.0.1}
 PUBKEY=${PUBKEY:-dev/id_rsa.pub}
 PRIVATEKEY=${PRIVATEKEY:-dev/id_rsa}
-
+TEMPLATE=$PWD/template.yaml;
 ############################################################
 # Helpers                                              #
 ############################################################
@@ -32,47 +32,47 @@ popd () {
 Help()
 {
   # Display Help
-  echo "Syntax: ./template.sh [-h|i|k]"
+  echo "Syntax: ./template.sh [-c|h|i|k|t]"
   echo "options:"
+  echo "c     please supply one of [create, delete] depending on whether you are enabling or disabling a sandbox remote instance"
   echo "h     Print this Help."
   echo "i     identifier for your vm prefix. Please check the ./manifests directory -"
   echo "      and choose something unique such as your intials or another  interesting/useful piece of trivia"
   echo "k     the ABSOLUTE path of the public key to insert in your remote instance"
-  echo
+  echo "t     the team abbreviation you are using to file your remote instance under"
 }
 
 ############################################################
-# Template
+# Create
 ############################################################
-Template()
+Create()
 {
-  INV=$(ls manifests/ | wc -l)
-  NUM=$(( $INV - 1 ))
+  INSTDIR="$BASEDIR/$TEAM"
+# make the child team/instance directories
+  mkdir -p $INSTDIR
+  pushd $INSTDIR
+  NUM=$(ls -l . | wc -l)
   PAD=`printf %03d $NUM`
   NAME="$NAMEPREF-$INIT-$PAD"
+  mkdir -p $NAME
   SSHPORT="$PORTPREF$PAD"
   KEYNAME=$(basename $KEY)
   DESTLOC=$DEST/$NAME/$KEYNAME
   FILESLOC=$DEST/$FILES
   DOCKERCONF=$FILESLOC/daemon.json
   UUIDGEN=$(hexdump -vn8 -e'4/4 "%08X" 1 "\n"' /dev/urandom | tr "[:upper:]" "[:lower:]" | xargs)
-  echo "... the chosen vm-name is $NAME "
-  echo "... the chosen public key path is $KEY ..."
 
-  pushd $BASEDIR
-  mkdir -p $NAME
-  cp $KEY $NAME
-  popd
 
+# make template the right vars
   rm /tmp/temp.yaml
-  ( echo "cat <<EOF >$BASEDIR/$NAME/vm.yaml";
-    cat template.yaml;
+  ( echo "cat <<EOF >$NAME/vm.yaml";
+    cat $TEMPLATE;
     echo "EOF";
   ) >/tmp/temp.yaml
   . /tmp/temp.yaml
   echo "==============================================="
   echo "your developer environment configuration is:"
-  cat $BASEDIR/$NAME/vm.yaml
+  cat  $NAME/vm.yaml
   echo "==============================================="
   echo "Please add the below to your \$USER/.ssh/config"
   echo "Host ${NAME}"
@@ -85,6 +85,29 @@ Template()
   echo "  StrictHostKeyChecking no"
   echo "  PasswordAuthentication no"
   echo "==============================================="
+  echo "enabling remote instance, please commit this change to git "
+# copy the public ssh key in the instance folder
+  cp $KEY $NAME
+  popd
+}
+
+############################################################
+# Delete
+############################################################
+Delete() {
+  TARGET=$(ls -d ${PWD}/manifests/${TEAM}/* | grep "vm-${INIT}-*")
+  COUNT=$(ls -d ${PWD}/manifests/${TEAM}/* | grep "vm-${INIT}-*" | wc -l)
+  pushd ${TARGET}
+  if [[ ${COUNT} -ne 1 ]]; then
+    echo "either no identifiers can be found (does the team directoy exist?) or "
+    echo "multiple files with the same identifier disabling must be applied manually"
+    exit
+  else
+    sed -i '' 's/running\: true/running\: false/g' vm.yaml 
+    echo "disabling remote instance, please commit this change to git"
+  fi
+  popd
+
 }
 
 ############################################################
@@ -92,24 +115,42 @@ Template()
 # Main program                                             #
 ############################################################
 ############################################################
-while getopts ":i:h:k:" option; do
+while getopts ":c:i:k:t:h" option; do
   case $option in
+    c)
+      CMD=${OPTARG}
+      ;;
     h) # display Help
       Help
       exit;;
     i)
       INIT=${OPTARG}
+      echo "you have set your unique identifier as ${INIT}..."
       ;;
     k)
       KEY=${OPTARG}
+      echo "you have set your public key as ${KEY}..."
+      ;;
+    t)
+      TEAM=${OPTARG}
+      if [ -z ${TEAM} ]; then
+        TEAM="default"
+      else
+        echo "you have set your team as ${TEAM}..."
+      fi
       ;;
     *)
       exit;;
   esac
 done
 
-if [ -z "${i}" ] || [ -z "${k}" ]; then
-    Template
-else
+
+if [ -z "${h}" ]; then
     Help
+elif [ -z "${i}" ] && [ -z "${k}" ] && [ -z "${t}" ] && [ "${CMD}" == "create" ]; then
+    Create
+elif [ -z "${i}" ] && [ -z "${t}" ] && [ "${CMD}" == "delete" ]; then
+    Delete
+elif [ -z "${CMD}" ]; then
+    echo " you need to supply one of the [create, delete] actions through passing the -c parameter"
 fi

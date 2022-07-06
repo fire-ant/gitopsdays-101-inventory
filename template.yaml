@@ -4,6 +4,8 @@ kind: VM
 metadata:
   name: ${NAME}
   uid: ${UUIDGEN}
+labels:
+  team: ${TEAM}
 spec:
   image:
     oci: chr1slavery/ignite-docker:20.04-amd64

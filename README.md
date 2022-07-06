@@ -12,21 +12,31 @@ set up a development or production backend per [GitOps101-backend](https://githu
 
 #### inventory setup
 
-to setup a micro-vm run:
-```
-./template.sh -k $PWD/id_rsa.pub -i cdl
-```
-
-where `-k $PWD/id_rsa.pub` is pointing to the absolute path of your SSH public key and `-i cdl` is supplying an identifier you can correlate to your configuration later.
-
-running this command recursively will create more vm entries under [manifests/](manifests/). you dont have to but it may be easier to add the .ssh/config entry. Otherwise remember these details and use them to test SSH login later.
-
 to see how the template script works run:
 ```
-./template.sh -h
+./vmctl -h
 ```
 
-Once reconciled (this shouldnt take longer than 30 seconds), you should be able to test the ssh login for the micro-vm. If this is running on your local workstation you should be able to do something like ```ssh root@127.0.0.1 -p 600** -i <YOUR_PRIVATE_KEY>``` noting the port is going to land between 60000-60100 and was published as part of the ```template.sh``` output earlier.
+to setup a micro-vm run:
+```
+./vmctl -t blue -k $PWD/id_rsa.pub -i cdl
+```
+
+where `-k $PWD/id_rsa.pub` is pointing to the absolute path of your SSH public key, `-t blue` is pointing to your 'team' directory  and `-i cdl` is supplying an identifier you can correlate to your configuration later.
+
+running this command recursively will create more vm entries under [manifests/](manifests/). you dont have to but it may be easier to add the .ssh/config entry. Otherwise remember these details and use them to test SSH login later. the command will provide an ssh config entry to be reused (though this is invasive so it is not automatic).
+
+to disable an environment use something like:
+
+```
+./vmctl -t blue -i cdk -k $PWD/id_rsa.pub -c delete
+```
+
+which will set the running status of the given instance to `false`, shutting it down.
+
+!!!NOTE - do not attempt to remove the vm entry as this will hang ignited daemon!!!
+
+Once reconciled (this shouldnt take longer than 30 seconds), you should be able to test the ssh login for the micro-vm. If this is running on your local workstation you should be able to do something like ```ssh root@127.0.0.1 -p 600** -i <YOUR_PRIVATE_KEY>``` noting the port is going to land between 60000-60100 and was published as part of the ```vmctl``` output earlier.
 
 ### APPENDIX:
 
