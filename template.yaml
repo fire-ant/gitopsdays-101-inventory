@@ -6,6 +6,7 @@ metadata:
   uid: ${UUIDGEN}
 labels:
   team: ${TEAM}
+  user: ${INIT}
 spec:
   image:
     oci: chr1slavery/ignite-docker:20.04-amd64

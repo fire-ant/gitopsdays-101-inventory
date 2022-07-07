@@ -88,6 +88,11 @@ Create()
   echo "enabling remote instance, please commit this change to git "
 # copy the public ssh key in the instance folder
   cp $KEY $NAME
+  if [[ $? != 0  ]]; then
+    echo "it looks like ${KEYNAME} has failed to copy to the '${NAME}' instance directory. please check and manually correct or remove the craeted entry and retry"
+  else
+    echo "${KEYNAME} has been successfully copied to the '${NAME}' instance directory"
+  fi
   popd
 }
 
@@ -145,12 +150,12 @@ while getopts ":c:i:k:t:h" option; do
 done
 
 
-if [ -z "${h}" ]; then
-    Help
-elif [ -z "${i}" ] && [ -z "${k}" ] && [ -z "${t}" ] && [ "${CMD}" == "create" ]; then
+if [ -z "${i}" ] && [ -z "${k}" ] && [ -z "${t}" ] && [ "${CMD}" == "create" ]; then
     Create
 elif [ -z "${i}" ] && [ -z "${t}" ] && [ "${CMD}" == "delete" ]; then
     Delete
 elif [ -z "${CMD}" ]; then
     echo " you need to supply one of the [create, delete] actions through passing the -c parameter"
+elif [ -z "${h}" ]; then
+    Help
 fi
